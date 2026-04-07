@@ -25,22 +25,55 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     filter: blur(0px);
 }
 
+/* CARD */
 .item {
     width: 110px;
     height: 110px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: white;
-    font-size: 13px;
-    border: 3px solid rgba(255,255,255,0.2);
-    outline: 4px solid rgba(255,255,255,0.3);
-    outline-offset: 4px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    background: #111;
 }
 
+/* IMAGE FILLS CARD */
+.item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+/* GLOW BORDER */
+.item::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.9;
+}
+
+/* CLEAN BORDER */
+.item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.15);
+}
+
+/* GRADIENT GLOWS */
+.Bronze::before { background: linear-gradient(135deg, #B87333, #FF9933); }
+.Silver::before { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); }
+.Gold::before { background: linear-gradient(135deg, #FFD700, #FFFACD); }
+.Platinum::before { background: linear-gradient(135deg, #66FFFF, #99FFFF); }
+.Diamond::before { background: linear-gradient(135deg, #4BB7E0, #A0E0FF); }
+.Elite::before { background: linear-gradient(135deg, #2F4F4F, #008080); }
+.Champion::before { background: linear-gradient(135deg, #B22222, #FFD700); }
+.Unreal::before { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
+
+/* CENTER BOX */
 .center-box {
     position: absolute;
     width: 122px;
@@ -52,6 +85,7 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     z-index: 10;
 }
 
+/* POPUP */
 #win-popup {
     position: absolute;
     top: -80px;
@@ -66,22 +100,7 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     z-index: 20;
 }
 
-/* Rank colors */
-.Bronze { background: linear-gradient(135deg, #B87333, #FF9933); }
-.Silver { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); color: black; }
-.Gold { background: linear-gradient(135deg, #FFD700, #FFFACD); color: black; }
-.Platinum { background: linear-gradient(135deg, #66FFFF, #99FFFF); color: black; }
-.Diamond { background: linear-gradient(135deg, #4BB7E0, #A0E0FF); }
-.Elite { background: linear-gradient(135deg, #2F4F4F, #008080); }
-.Champion { background: linear-gradient(135deg, #B22222, #FFD700); }
-.Unreal { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
-
-.item img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 5px;
-}
-
+/* BUTTON */
 #spin-btn {
     position: absolute;
     bottom: 20px;
@@ -107,21 +126,22 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 
 <button id="spin-btn">Spin!</button>
 
-<!-- Sounds -->
+<!-- SOUNDS -->
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
 <audio id="tick-sound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
+// 🔥 PASTE YOUR IMAGE LINKS HERE
 const ranks = [
-  {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
-  {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
-  {name: "Gold", icon: "https://i.imgur.com/9M2Jv7I.png"},
-  {name: "Platinum", icon: "https://i.imgur.com/ehZxH8b.png"},
-  {name: "Diamond", icon: "https://i.imgur.com/j5r5iyt.png"},
-  {name: "Elite", icon: "https://i.imgur.com/PfjzYWe.png"},
-  {name: "Champion", icon: "https://i.imgur.com/FFG2m5x.png"},
-  {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
+  {name: "Bronze", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Silver", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Gold", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Platinum", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Diamond", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Elite", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Champion", icon: "PASTE_IMAGE_LINK_HERE"},
+  {name: "Unreal", icon: "PASTE_IMAGE_LINK_HERE"}
 ];
 
 // Build track
@@ -130,6 +150,7 @@ for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
 
+// Create items
 fullList.forEach(rank => {
     const div = document.createElement("div");
     div.className = "item " + rank.name;
@@ -137,11 +158,7 @@ fullList.forEach(rank => {
     const img = document.createElement("img");
     img.src = rank.icon;
 
-    const span = document.createElement("span");
-    span.innerText = rank.name;
-
     div.appendChild(img);
-    div.appendChild(span);
     track.appendChild(div);
 });
 
@@ -183,17 +200,17 @@ function spin(result, user="Someone") {
     track.style.transition = "none";
     track.style.transform = `translateX(${centerStart}px)`;
 
-    // START BLUR
+    // BLUR START
     track.style.filter = "blur(6px)";
 
-    // Tick loop (fast → slow)
+    // TICK SYSTEM (slowdown)
     let speed = 50;
-    tickInterval = setInterval(() => {
+    tickInterval = setInterval(function tick() {
         tickSound.currentTime = 0;
         tickSound.play();
-        speed += 15; // slows ticks
+        speed += 15;
         clearInterval(tickInterval);
-        tickInterval = setInterval(arguments.callee, speed);
+        tickInterval = setInterval(tick, speed);
     }, speed);
 
     setTimeout(() => {
@@ -201,17 +218,17 @@ function spin(result, user="Someone") {
         track.style.transform = `translateX(${-finalOffset}px)`;
     }, 50);
 
-    // REMOVE BLUR near end
+    // REMOVE BLUR
     setTimeout(() => {
         track.style.filter = "blur(0px)";
     }, 3500);
 
-    // STOP ticks
+    // STOP TICKS
     setTimeout(() => {
         clearInterval(tickInterval);
     }, 4500);
 
-    // WIN popup
+    // WIN POPUP
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
