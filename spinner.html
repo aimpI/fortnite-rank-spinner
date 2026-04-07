@@ -156,6 +156,7 @@ const tickSound = document.getElementById("tick-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
+let spinning = false;
 let tickInterval;
 let blurInterval;
 
@@ -269,17 +270,26 @@ function spin(result, user="Someone") {
 
     setTimeout(() => {
         hideSpinner();
+        spinning = false;
     }, 7000);
 }
 
-// ✅ TikFinity Event Listener (THIS IS THE IMPORTANT PART)
+// 🔥 THIS IS WHAT MAKES IT WORK
 window.addEventListener("onEventReceived", function (obj) {
-    if (obj.detail.listener === "spinner_spin") {
-        const data = obj.detail.event;
+
+    if (obj.detail.listener === "follow") {
+
+        if (spinning) return;
+
+        spinning = true;
+
+        const user = obj.detail.event.uniqueId || "Someone";
+        const randomRank = ranks[Math.floor(Math.random() * ranks.length)].name;
 
         showSpinner();
-        spin(data.result, data.user || "Someone");
+        spin(randomRank, user);
     }
+
 });
 </script>
 
