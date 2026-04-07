@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Fortnite Spinner</title>
@@ -84,17 +82,33 @@ body {
     100% {opacity: 1; transform: translate(-50%, -20px);}
 }
 
-/* Fortnite-style colors */
-.Bronze { background: #B87333; }
-.Silver { background: #C0C0C0; color: black; }
-.Gold { background: #FFD700; color: black; }
-.Platinum { background: #66FFFF; color: black; }
-.Diamond { background: #4BB7E0; }
-.Elite { background: #8A2BE2; }
-.Champion { background: #FF006D; }
-.Unreal { 
-    background: linear-gradient(135deg, #FF4500, #FFA500, #9400D3);
-    box-shadow: 0 0 15px rgba(255,69,0,0.7);
+/* Fortnite-style gradients for each rank */
+.Bronze {
+    background: linear-gradient(135deg, #B87333, #FF9933); /* warm copper → orange highlight */
+}
+.Silver {
+    background: linear-gradient(135deg, #C0C0C0, #E0E0E0); /* metallic gray → reflective steel */
+    color: black;
+}
+.Gold {
+    background: linear-gradient(135deg, #FFD700, #FFFACD); /* bright gold → luminous yellow */
+    color: black;
+}
+.Platinum {
+    background: linear-gradient(135deg, #66FFFF, #99FFFF); /* aqua blue → light platinum */
+    color: black;
+}
+.Diamond {
+    background: linear-gradient(135deg, #4BB7E0, #A0E0FF); /* icy blue → crystalline highlights */
+}
+.Elite {
+    background: linear-gradient(135deg, #2F4F4F, #008080); /* dark charcoal → teal accents */
+}
+.Champion {
+    background: linear-gradient(135deg, #B22222, #FFD700); /* red → gold accent combo */
+}
+.Unreal {
+    background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); /* violet → blue-purple gradient */
 }
 
 /* Icon inside item */
@@ -118,7 +132,7 @@ body {
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// Ranks (replace icons with actual URLs)
+// Ranks with icons (replace URLs with your own PNGs if desired)
 const ranks = [
   {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
   {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
@@ -142,14 +156,7 @@ fullList.forEach(rank => {
     div.className = "item";
 
     // Add color class
-    if(rank.name === "Bronze") div.classList.add("Bronze");
-    else if(rank.name === "Silver") div.classList.add("Silver");
-    else if(rank.name === "Gold") div.classList.add("Gold");
-    else if(rank.name === "Platinum") div.classList.add("Platinum");
-    else if(rank.name === "Diamond") div.classList.add("Diamond");
-    else if(rank.name === "Elite") div.classList.add("Elite");
-    else if(rank.name === "Champion") div.classList.add("Champion");
-    else if(rank.name === "Unreal") div.classList.add("Unreal");
+    div.classList.add(rank.name);
 
     // Add icon and name
     const img = document.createElement("img");
@@ -174,7 +181,6 @@ window.addEventListener("message", (event) => {
 function spin(result) {
     const itemWidth = 122;
     const index = fullList.lastIndexOf(fullList.find(r => r.name===result));
-
     const offset = (index * itemWidth) - (window.innerWidth / 2 - 60);
 
     spinSound.currentTime = 0;
