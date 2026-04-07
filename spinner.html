@@ -25,7 +25,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     filter: blur(0px);
 }
 
-/* CARD */
 .item {
     width: 110px;
     height: 110px;
@@ -35,7 +34,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     background: #111;
 }
 
-/* IMAGE FILLS CARD */
 .item img {
     width: 100%;
     height: 100%;
@@ -43,7 +41,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     border-radius: 16px;
 }
 
-/* GLOW BORDER */
 .item::before {
     content: "";
     position: absolute;
@@ -54,7 +51,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     opacity: 0.9;
 }
 
-/* CLEAN BORDER */
 .item::after {
     content: "";
     position: absolute;
@@ -63,7 +59,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     border: 2px solid rgba(255,255,255,0.15);
 }
 
-/* GRADIENT GLOWS */
 .Bronze::before { background: linear-gradient(135deg, #B87333, #FF9933); }
 .Silver::before { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); }
 .Gold::before { background: linear-gradient(135deg, #FFD700, #FFFACD); }
@@ -73,7 +68,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 .Champion::before { background: linear-gradient(135deg, #B22222, #FFD700); }
 .Unreal::before { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
 
-/* CENTER BOX */
 .center-box {
     position: absolute;
     width: 122px;
@@ -85,7 +79,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     z-index: 10;
 }
 
-/* POPUP */
 #win-popup {
     position: absolute;
     top: -80px;
@@ -100,7 +93,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     z-index: 20;
 }
 
-/* BUTTON */
 #spin-btn {
     position: absolute;
     bottom: 20px;
@@ -126,13 +118,11 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 
 <button id="spin-btn">Spin!</button>
 
-<!-- SOUNDS -->
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
 <audio id="tick-sound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// 🔥 PASTE YOUR IMAGE LINKS HERE
 const ranks = [
   {name: "Bronze", icon: "https://i.imgur.com/iY0Zmmw.jpeg"},
   {name: "Silver", icon: "https://i.imgur.com/jD8WHLV.jpeg"},
@@ -144,13 +134,11 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/AYIvINF.jpeg"}
 ];
 
-// Build track
 let fullList = [];
 for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
 
-// Create items
 fullList.forEach(rank => {
     const div = document.createElement("div");
     div.className = "item " + rank.name;
@@ -170,7 +158,6 @@ const container = document.getElementById("container");
 const centerStart = (container.offsetWidth / 2) - (itemWidth / 2);
 track.style.transform = `translateX(${centerStart}px)`;
 
-// Sounds
 const spinSound = document.getElementById("spin-sound");
 const tickSound = document.getElementById("tick-sound");
 const winSound = document.getElementById("win-sound");
@@ -197,11 +184,9 @@ function spin(result, user="Someone") {
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // RESET
     track.style.transition = "none";
     track.style.transform = `translateX(${centerStart}px)`;
 
-    // 🎯 DYNAMIC BLUR SYSTEM
     let blurAmount = 10;
     track.style.filter = `blur(${blurAmount}px)`;
 
@@ -217,7 +202,6 @@ function spin(result, user="Someone") {
         }
     }, 50);
 
-    // 🔊 Tick slowdown system
     let speed = 50;
     tickInterval = setInterval(function tick() {
         tickSound.currentTime = 0;
@@ -232,14 +216,12 @@ function spin(result, user="Someone") {
         track.style.transform = `translateX(${-finalOffset}px)`;
     }, 50);
 
-    // STOP intervals
     setTimeout(() => {
         clearInterval(tickInterval);
         clearInterval(blurInterval);
         track.style.filter = "blur(0px)";
     }, 4500);
 
-    // WIN popup
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
@@ -249,13 +231,11 @@ function spin(result, user="Someone") {
     }, 4600);
 }
 
-// Button
 document.getElementById("spin-btn").addEventListener("click", () => {
     const randomIndex = Math.floor(Math.random() * ranks.length);
     spin(ranks[randomIndex].name, "Player");
 });
 
-// OBS
 window.addEventListener("message", (event) => {
     if(event.data.type === "spin") {
         spin(event.data.result, event.data.user || "Someone");
