@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Fortnite Spinner</title>
@@ -42,7 +44,9 @@ body {
     color: white;
     text-align: center;
     font-size: 13px;
-    border: 3px solid rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.2); /* inner border */
+    outline: 4px solid rgba(255,255,255,0.3); /* shadowless outer border */
+    outline-offset: 4px;
     position: relative;
 }
 
@@ -83,40 +87,33 @@ body {
 }
 
 /* Fortnite-style gradients for each rank */
-.Bronze {
-    background: linear-gradient(135deg, #B87333, #FF9933); /* warm copper → orange highlight */
-}
-.Silver {
-    background: linear-gradient(135deg, #C0C0C0, #E0E0E0); /* metallic gray → reflective steel */
-    color: black;
-}
-.Gold {
-    background: linear-gradient(135deg, #FFD700, #FFFACD); /* bright gold → luminous yellow */
-    color: black;
-}
-.Platinum {
-    background: linear-gradient(135deg, #66FFFF, #99FFFF); /* aqua blue → light platinum */
-    color: black;
-}
-.Diamond {
-    background: linear-gradient(135deg, #4BB7E0, #A0E0FF); /* icy blue → crystalline highlights */
-}
-.Elite {
-    background: linear-gradient(135deg, #2F4F4F, #008080); /* dark charcoal → teal accents */
-}
-.Champion {
-    background: linear-gradient(135deg, #B22222, #FFD700); /* red → gold accent combo */
-}
-.Unreal {
-    background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); /* violet → blue-purple gradient */
-}
+.Bronze { background: linear-gradient(135deg, #B87333, #FF9933); }
+.Silver { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); color: black; }
+.Gold { background: linear-gradient(135deg, #FFD700, #FFFACD); color: black; }
+.Platinum { background: linear-gradient(135deg, #66FFFF, #99FFFF); color: black; }
+.Diamond { background: linear-gradient(135deg, #4BB7E0, #A0E0FF); }
+.Elite { background: linear-gradient(135deg, #2F4F4F, #008080); }
+.Champion { background: linear-gradient(135deg, #B22222, #FFD700); }
+.Unreal { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
 
 /* Icon inside item */
-.item img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 5px;
+.item img { width: 50px; height: 50px; margin-bottom: 5px; }
+
+/* Spin button */
+#spin-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background: gold;
+    color: black;
+    cursor: pointer;
 }
+#spin-btn:hover { background: #FFD700; }
 </style>
 </head>
 <body>
@@ -127,12 +124,14 @@ body {
     <div id="win-popup"></div>
 </div>
 
+<button id="spin-btn">Spin!</button>
+
 <!-- Sounds -->
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// Ranks with icons (replace URLs with your own PNGs if desired)
+// Ranks
 const ranks = [
   {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
   {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
@@ -144,28 +143,22 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
 ];
 
-// Duplicate for smooth scroll
+// Duplicate list for looping effect
 let fullList = [];
 for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
 
-// Create items
+// Create spinner items
 fullList.forEach(rank => {
     const div = document.createElement("div");
-    div.className = "item";
-
-    // Add color class
-    div.classList.add(rank.name);
-
-    // Add icon and name
+    div.className = "item " + rank.name;
     const img = document.createElement("img");
     img.src = rank.icon;
     div.appendChild(img);
     const span = document.createElement("span");
     span.innerText = rank.name;
     div.appendChild(span);
-
     track.appendChild(div);
 });
 
@@ -174,12 +167,8 @@ const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
-window.addEventListener("message", (event) => {
-    if(event.data.type === "spin") spin(event.data.result);
-});
-
 function spin(result) {
-    const itemWidth = 122;
+    const itemWidth = 122; // width + gap
     const index = fullList.lastIndexOf(fullList.find(r => r.name===result));
     const offset = (index * itemWidth) - (window.innerWidth / 2 - 60);
 
@@ -190,11 +179,10 @@ function spin(result) {
     track.style.transform = "translateX(0px)";
 
     setTimeout(() => {
-        track.style.transition = "transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)";
+        track.style.transition = "transform 4s cubic-bezier(0.1,0.7,0.1,1)";
         track.style.transform = `translateX(${-offset}px)`;
     }, 50);
 
-    // Show popup after spin
     setTimeout(() => {
         winPopup.innerText = `You got ${result}!`;
         winPopup.style.display = "block";
@@ -203,6 +191,15 @@ function spin(result) {
         setTimeout(() => winPopup.style.display = "none", 2000);
     }, 4200);
 }
+
+// Random spin function
+function spinRandom() {
+    const randomIndex = Math.floor(Math.random() * ranks.length);
+    spin(ranks[randomIndex].name);
+}
+
+// Button event
+document.getElementById("spin-btn").addEventListener("click", spinRandom);
 </script>
 </body>
 </html>
