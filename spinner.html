@@ -45,7 +45,6 @@ body {
     text-align: center;
     font-size: 13px;
     border: 3px solid rgba(255,255,255,0.2);
-    background: #444;
     position: relative;
 }
 
@@ -86,17 +85,16 @@ body {
 }
 
 /* Fortnite-style colors */
-.Unranked { background: #444; }
-.Bronze { background: #cd7f32; }
-.Silver { background: #c0c0c0; }
-.Gold { background: #ffd700; color: black; }
-.Platinum { background: #00e5ff; color: black; }
-.Diamond { background: #4fc3f7; }
-.Elite { background: #9c27b0; }
-.Champion { background: #ff4081; }
+.Bronze { background: #B87333; }
+.Silver { background: #C0C0C0; color: black; }
+.Gold { background: #FFD700; color: black; }
+.Platinum { background: #66FFFF; color: black; }
+.Diamond { background: #4BB7E0; }
+.Elite { background: #8A2BE2; }
+.Champion { background: #FF006D; }
 .Unreal { 
-    background: linear-gradient(45deg, red, orange, purple);
-    box-shadow: 0 0 15px rgba(255,0,255,0.8);
+    background: linear-gradient(135deg, #FF4500, #FFA500, #9400D3);
+    box-shadow: 0 0 15px rgba(255,69,0,0.7);
 }
 
 /* Icon inside item */
@@ -120,24 +118,13 @@ body {
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// Ranks with icons (example images, replace with your own if you want)
+// Ranks (replace icons with actual URLs)
 const ranks = [
-  {name: "Unranked", icon: "https://i.imgur.com/0XnH7mB.png"},
-  {name: "Bronze I", icon: "https://i.imgur.com/0XnH7mB.png"},
-  {name: "Bronze II", icon: "https://i.imgur.com/0XnH7mB.png"},
-  {name: "Bronze III", icon: "https://i.imgur.com/0XnH7mB.png"},
-  {name: "Silver I", icon: "https://i.imgur.com/8c0HcwR.png"},
-  {name: "Silver II", icon: "https://i.imgur.com/8c0HcwR.png"},
-  {name: "Silver III", icon: "https://i.imgur.com/8c0HcwR.png"},
-  {name: "Gold I", icon: "https://i.imgur.com/9M2Jv7I.png"},
-  {name: "Gold II", icon: "https://i.imgur.com/9M2Jv7I.png"},
-  {name: "Gold III", icon: "https://i.imgur.com/9M2Jv7I.png"},
-  {name: "Platinum I", icon: "https://i.imgur.com/ehZxH8b.png"},
-  {name: "Platinum II", icon: "https://i.imgur.com/ehZxH8b.png"},
-  {name: "Platinum III", icon: "https://i.imgur.com/ehZxH8b.png"},
-  {name: "Diamond I", icon: "https://i.imgur.com/j5r5iyt.png"},
-  {name: "Diamond II", icon: "https://i.imgur.com/j5r5iyt.png"},
-  {name: "Diamond III", icon: "https://i.imgur.com/j5r5iyt.png"},
+  {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
+  {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
+  {name: "Gold", icon: "https://i.imgur.com/9M2Jv7I.png"},
+  {name: "Platinum", icon: "https://i.imgur.com/ehZxH8b.png"},
+  {name: "Diamond", icon: "https://i.imgur.com/j5r5iyt.png"},
   {name: "Elite", icon: "https://i.imgur.com/PfjzYWe.png"},
   {name: "Champion", icon: "https://i.imgur.com/FFG2m5x.png"},
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
@@ -155,15 +142,14 @@ fullList.forEach(rank => {
     div.className = "item";
 
     // Add color class
-    if(rank.name.includes("Bronze")) div.classList.add("Bronze");
-    else if(rank.name.includes("Silver")) div.classList.add("Silver");
-    else if(rank.name.includes("Gold")) div.classList.add("Gold");
-    else if(rank.name.includes("Platinum")) div.classList.add("Platinum");
-    else if(rank.name.includes("Diamond")) div.classList.add("Diamond");
-    else if(rank.name.includes("Elite")) div.classList.add("Elite");
-    else if(rank.name.includes("Champion")) div.classList.add("Champion");
-    else if(rank.name.includes("Unreal")) div.classList.add("Unreal");
-    else div.classList.add("Unranked");
+    if(rank.name === "Bronze") div.classList.add("Bronze");
+    else if(rank.name === "Silver") div.classList.add("Silver");
+    else if(rank.name === "Gold") div.classList.add("Gold");
+    else if(rank.name === "Platinum") div.classList.add("Platinum");
+    else if(rank.name === "Diamond") div.classList.add("Diamond");
+    else if(rank.name === "Elite") div.classList.add("Elite");
+    else if(rank.name === "Champion") div.classList.add("Champion");
+    else if(rank.name === "Unreal") div.classList.add("Unreal");
 
     // Add icon and name
     const img = document.createElement("img");
