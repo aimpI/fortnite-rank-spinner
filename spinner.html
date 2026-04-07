@@ -68,6 +68,12 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 .Champion::before { background: linear-gradient(135deg, #B22222, #FFD700); }
 .Unreal::before { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
 
+.winner {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+    z-index: 20;
+}
+
 .center-box {
     position: absolute;
     width: 122px;
@@ -135,7 +141,7 @@ const ranks = [
 ];
 
 let fullList = [];
-for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
+for(let i=0;i<10;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
 
@@ -172,10 +178,11 @@ function spin(result, user="Someone") {
 
     const containerRect = container.getBoundingClientRect();
     const boxRect = centerBox.getBoundingClientRect();
-
     const boxCenter = boxRect.left - containerRect.left + (boxRect.width / 2);
 
-    const index = fullList.map(r => r.name).lastIndexOf(result);
+    const baseIndex = ranks.findIndex(r => r.name === result);
+    const loops = 5;
+    const index = loops * ranks.length + baseIndex;
 
     const totalWidth = itemWidth + gap;
     const targetX = index * totalWidth;
@@ -192,7 +199,6 @@ function spin(result, user="Someone") {
 
     blurInterval = setInterval(() => {
         blurAmount *= 0.92;
-
         if (blurAmount <= 0.3) {
             blurAmount = 0;
             track.style.filter = "blur(0px)";
@@ -223,12 +229,48 @@ function spin(result, user="Someone") {
     }, 4500);
 
     setTimeout(() => {
+        const items = document.querySelectorAll(".item");
+
+        let closestItem = null;
+        let closestDistance = Infinity;
+
+        items.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            const center = rect.left + rect.width / 2;
+
+            const dist = Math.abs(center - boxCenter);
+
+            if (dist < closestDistance) {
+                closestDistance = dist;
+                closestItem = el;
+            }
+        });
+
+        if (closestItem) {
+            closestItem.classList.add("winner");
+        }
+
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
         winSound.currentTime = 0;
         winSound.play();
-        setTimeout(() => winPopup.style.display = "none", 2000);
+
+        setTimeout(() => {
+            winPopup.style.display = "none";
+            if (closestItem) closestItem.classList.remove("winner");
+        }, 2000);
+
     }, 4600);
+
+    setTimeout(() => {
+        track.style.transition = "none";
+
+        const resetIndex = baseIndex + ranks.length * 2;
+        const resetX = resetIndex * (itemWidth + gap) - boxCenter + (itemWidth / 2);
+
+        track.style.transform = `translateX(${-resetX}px)`;
+
+    }, 4700);
 }
 
 document.getElementById("spin-btn").addEventListener("click", () => {
