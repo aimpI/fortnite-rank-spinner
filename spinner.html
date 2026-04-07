@@ -134,14 +134,14 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 <script>
 // 🔥 PASTE YOUR IMAGE LINKS HERE
 const ranks = [
-  {name: "Bronze", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Silver", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Gold", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Platinum", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Diamond", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Elite", icon: "PASTE_IMAGE_LINK_HERE"},
-  {name: "Champion", icon: "https://fnggcdn.com/assets-s/cujFkO.jpg"},
-  {name: "Unreal", icon: "PASTE_IMAGE_LINK_HERE"}
+  {name: "Bronze", icon: "https://i.imgur.com/iY0Zmmw.jpeg"},
+  {name: "Silver", icon: "https://i.imgur.com/jD8WHLV.jpeg"},
+  {name: "Gold", icon: "https://i.imgur.com/BFr63N1.jpeg"},
+  {name: "Platinum", icon: "https://i.imgur.com/ApqmCS7.jpeg"},
+  {name: "Diamond", icon: "https://i.imgur.com/WafDzae.jpeg"},
+  {name: "Elite", icon: "https://i.imgur.com/CT0rFuy.jpeg"},
+  {name: "Champion", icon: "https://i.imgur.com/wsbc2th.jpeg"},
+  {name: "Unreal", icon: "https://i.imgur.com/AYIvINF.jpeg"}
 ];
 
 // Build track
@@ -177,6 +177,7 @@ const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
 let tickInterval;
+let blurInterval;
 
 function spin(result, user="Someone") {
 
@@ -200,10 +201,23 @@ function spin(result, user="Someone") {
     track.style.transition = "none";
     track.style.transform = `translateX(${centerStart}px)`;
 
-    // BLUR START
-    track.style.filter = "blur(6px)";
+    // 🎯 DYNAMIC BLUR SYSTEM
+    let blurAmount = 10;
+    track.style.filter = `blur(${blurAmount}px)`;
 
-    // TICK SYSTEM (slowdown)
+    blurInterval = setInterval(() => {
+        blurAmount *= 0.92;
+
+        if (blurAmount <= 0.3) {
+            blurAmount = 0;
+            track.style.filter = "blur(0px)";
+            clearInterval(blurInterval);
+        } else {
+            track.style.filter = `blur(${blurAmount}px)`;
+        }
+    }, 50);
+
+    // 🔊 Tick slowdown system
     let speed = 50;
     tickInterval = setInterval(function tick() {
         tickSound.currentTime = 0;
@@ -218,17 +232,14 @@ function spin(result, user="Someone") {
         track.style.transform = `translateX(${-finalOffset}px)`;
     }, 50);
 
-    // REMOVE BLUR
-    setTimeout(() => {
-        track.style.filter = "blur(0px)";
-    }, 3500);
-
-    // STOP TICKS
+    // STOP intervals
     setTimeout(() => {
         clearInterval(tickInterval);
+        clearInterval(blurInterval);
+        track.style.filter = "blur(0px)";
     }, 4500);
 
-    // WIN POPUP
+    // WIN popup
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
