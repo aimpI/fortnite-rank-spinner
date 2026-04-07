@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Fortnite Spinner</title>
+
 <style>
 body { margin: 0; overflow: hidden; background: transparent; font-family: Arial, sans-serif; }
 
@@ -21,6 +22,7 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     position: absolute;
     left: 0;
     transform: translateX(0);
+    filter: blur(0px);
 }
 
 .item {
@@ -33,7 +35,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     align-items: center;
     font-weight: bold;
     color: white;
-    text-align: center;
     font-size: 13px;
     border: 3px solid rgba(255,255,255,0.2);
     outline: 4px solid rgba(255,255,255,0.3);
@@ -62,12 +63,10 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     font-size: 18px;
     border-radius: 10px;
     display: none;
-    text-align: center;
     z-index: 20;
-    box-shadow: 0 0 15px gold;
 }
 
-/* Gradients */
+/* Rank colors */
 .Bronze { background: linear-gradient(135deg, #B87333, #FF9933); }
 .Silver { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); color: black; }
 .Gold { background: linear-gradient(135deg, #FFD700, #FFFACD); color: black; }
@@ -93,11 +92,11 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     border: none;
     border-radius: 8px;
     background: gold;
-    color: black;
     cursor: pointer;
 }
 </style>
 </head>
+
 <body>
 
 <div id="container">
@@ -108,11 +107,12 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 
 <button id="spin-btn">Spin!</button>
 
+<!-- Sounds -->
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
+<audio id="tick-sound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// Ranks
 const ranks = [
   {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
   {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
@@ -124,13 +124,12 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
 ];
 
-// Duplicate list
+// Build track
 let fullList = [];
 for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
 
-// Create items
 fullList.forEach(rank => {
     const div = document.createElement("div");
     div.className = "item " + rank.name;
@@ -150,15 +149,17 @@ const gap = 12;
 const item = document.querySelector(".item");
 const itemWidth = item.offsetWidth;
 
-// PERFECT starting center
 const container = document.getElementById("container");
 const centerStart = (container.offsetWidth / 2) - (itemWidth / 2);
 track.style.transform = `translateX(${centerStart}px)`;
 
-// Sounds + popup
+// Sounds
 const spinSound = document.getElementById("spin-sound");
+const tickSound = document.getElementById("tick-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
+
+let tickInterval;
 
 function spin(result, user="Someone") {
 
@@ -173,22 +174,44 @@ function spin(result, user="Someone") {
 
     const totalWidth = itemWidth + gap;
     const targetX = index * totalWidth;
-
     const finalOffset = targetX - boxCenter + (itemWidth / 2);
 
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // Reset
+    // RESET
     track.style.transition = "none";
     track.style.transform = `translateX(${centerStart}px)`;
 
+    // START BLUR
+    track.style.filter = "blur(6px)";
+
+    // Tick loop (fast → slow)
+    let speed = 50;
+    tickInterval = setInterval(() => {
+        tickSound.currentTime = 0;
+        tickSound.play();
+        speed += 15; // slows ticks
+        clearInterval(tickInterval);
+        tickInterval = setInterval(arguments.callee, speed);
+    }, speed);
+
     setTimeout(() => {
-        // 🔥 REALISTIC SLOWDOWN
-        track.style.transition = "transform 4.5s cubic-bezier(0.15, 0.85, 0.25, 1)";
+        track.style.transition = "transform 4.5s cubic-bezier(0.15,0.85,0.25,1)";
         track.style.transform = `translateX(${-finalOffset}px)`;
     }, 50);
 
+    // REMOVE BLUR near end
+    setTimeout(() => {
+        track.style.filter = "blur(0px)";
+    }, 3500);
+
+    // STOP ticks
+    setTimeout(() => {
+        clearInterval(tickInterval);
+    }, 4500);
+
+    // WIN popup
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
@@ -198,18 +221,19 @@ function spin(result, user="Someone") {
     }, 4600);
 }
 
-// Button test
+// Button
 document.getElementById("spin-btn").addEventListener("click", () => {
     const randomIndex = Math.floor(Math.random() * ranks.length);
     spin(ranks[randomIndex].name, "Player");
 });
 
-// OBS event
+// OBS
 window.addEventListener("message", (event) => {
     if(event.data.type === "spin") {
         spin(event.data.result, event.data.user || "Someone");
     }
 });
 </script>
+
 </body>
 </html>
