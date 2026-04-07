@@ -14,6 +14,8 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     align-items: center;
     justify-content: center;
     position: relative;
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
 #track {
@@ -98,19 +100,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     display: none;
     z-index: 20;
 }
-
-#spin-btn {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background: gold;
-    cursor: pointer;
-}
 </style>
 </head>
 
@@ -121,8 +110,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     <div id="track"></div>
     <div id="win-popup"></div>
 </div>
-
-<button id="spin-btn">Spin!</button>
 
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
 <audio id="tick-sound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
@@ -171,6 +158,14 @@ const winPopup = document.getElementById("win-popup");
 
 let tickInterval;
 let blurInterval;
+
+function showSpinner() {
+    document.getElementById("container").style.opacity = "1";
+}
+
+function hideSpinner() {
+    document.getElementById("container").style.opacity = "0";
+}
 
 function spin(result, user="Someone") {
 
@@ -271,16 +266,19 @@ function spin(result, user="Someone") {
         track.style.transform = `translateX(${-resetX}px)`;
 
     }, 4700);
+
+    setTimeout(() => {
+        hideSpinner();
+    }, 7000);
 }
 
-document.getElementById("spin-btn").addEventListener("click", () => {
-    const randomIndex = Math.floor(Math.random() * ranks.length);
-    spin(ranks[randomIndex].name, "Player");
-});
+// ✅ TikFinity Event Listener (THIS IS THE IMPORTANT PART)
+window.addEventListener("onEventReceived", function (obj) {
+    if (obj.detail.listener === "spinner_spin") {
+        const data = obj.detail.event;
 
-window.addEventListener("message", (event) => {
-    if(event.data.type === "spin") {
-        spin(event.data.result, event.data.user || "Someone");
+        showSpinner();
+        spin(data.result, data.user || "Someone");
     }
 });
 </script>
