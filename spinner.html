@@ -44,7 +44,7 @@ body {
     color: white;
     text-align: center;
     font-size: 13px;
-    border: 3px solid rgba(255,255,255,0.2); /* inner border */
+    border: 3px solid rgba(255,255,255,0.2);
     outline: 4px solid rgba(255,255,255,0.3); /* shadowless outer border */
     outline-offset: 4px;
     position: relative;
@@ -62,7 +62,7 @@ body {
     z-index: 10;
 }
 
-/* Win popup */
+/* Win popup overlay */
 #win-popup {
     position: absolute;
     top: -80px;
@@ -99,7 +99,7 @@ body {
 /* Icon inside item */
 .item img { width: 50px; height: 50px; margin-bottom: 5px; }
 
-/* Spin button */
+/* Spin button for testing outside OBS */
 #spin-btn {
     position: absolute;
     bottom: 20px;
@@ -167,7 +167,7 @@ const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
-function spin(result) {
+function spin(result, user="Someone") {
     const itemWidth = 122; // width + gap
     const index = fullList.lastIndexOf(fullList.find(r => r.name===result));
     const offset = (index * itemWidth) - (window.innerWidth / 2 - 60);
@@ -184,7 +184,7 @@ function spin(result) {
     }, 50);
 
     setTimeout(() => {
-        winPopup.innerText = `You got ${result}!`;
+        winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
         winSound.currentTime = 0;
         winSound.play();
@@ -192,14 +192,22 @@ function spin(result) {
     }, 4200);
 }
 
-// Random spin function
+// Random spin function for testing outside OBS
 function spinRandom() {
     const randomIndex = Math.floor(Math.random() * ranks.length);
     spin(ranks[randomIndex].name);
 }
 
-// Button event
 document.getElementById("spin-btn").addEventListener("click", spinRandom);
+
+// Listen for C# / OBS events
+window.addEventListener("message", (event) => {
+    if(event.data.type === "spin") {
+        const result = event.data.result;
+        const user = event.data.user || "Someone";
+        spin(result, user);
+    }
+});
 </script>
 </body>
 </html>
