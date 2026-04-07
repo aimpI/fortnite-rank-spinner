@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -66,7 +67,7 @@ fullList.forEach(rank => {
     track.appendChild(div);
 });
 
-// Spin logic - exact rank centering + smooth animation
+// Spin logic - multi-loop, faster, exact centering
 const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
@@ -75,37 +76,38 @@ function spin(result, user="Someone") {
     const itemWidth = 122; // item + gap
     const numRanks = ranks.length;
 
-    // Random duplicate for smooth scrolling
-    const duplicateIndex = Math.floor(Math.random() * duplicates);
+    const loops = 5; // number of full loops before stopping (more = longer spin)
 
-    // Exact index in fullList
-    const index = duplicateIndex * numRanks + ranks.findIndex(r => r.name === result);
+    // exact index of chosen rank
+    const rankIndex = ranks.findIndex(r => r.name === result);
 
-    // Center calculation
+    // total index in fullList including loops
+    const totalIndex = loops * numRanks + rankIndex;
+
     const centerOffset = (window.innerWidth / 2) - (itemWidth / 2);
-    const targetPos = (index * itemWidth) - centerOffset;
+    const targetPos = (totalIndex * itemWidth) - centerOffset;
 
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // Reset position
+    // reset track position
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
 
     setTimeout(() => {
-        // Smooth acceleration → deceleration
-        track.style.transition = "transform 4s cubic-bezier(0.25,0.1,0.25,1)";
+        // faster animation, smooth acceleration → deceleration
+        track.style.transition = "transform 3s cubic-bezier(0.25,0.1,0.25,1)";
         track.style.transform = `translateX(${-targetPos}px)`;
     }, 50);
 
-    // Popup overlay
+    // popup overlay
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
         winSound.currentTime = 0;
         winSound.play();
         setTimeout(() => winPopup.style.display = "none", 2000);
-    }, 4200);
+    }, 3200);
 }
 
 // Random spin for testing
