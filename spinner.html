@@ -37,7 +37,7 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
 <script>
-// Original ranks
+// Ranks
 const ranks = [
   {name: "Bronze", icon: "https://i.imgur.com/0XnH7mB.png"},
   {name: "Silver", icon: "https://i.imgur.com/8c0HcwR.png"},
@@ -49,7 +49,7 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
 ];
 
-// Duplicate list for smooth looping
+// Duplicate ranks for smooth looping
 let fullList = [];
 const duplicates = 6;
 for(let i=0;i<duplicates;i++) fullList = fullList.concat(ranks);
@@ -67,49 +67,41 @@ fullList.forEach(rank => {
     track.appendChild(div);
 });
 
-// Spin logic - multi-loop, exact centering including CSS gap
+// Measure item width + gap
+const gap = 12;
+let itemWidth = document.querySelector(".item").getBoundingClientRect().width;
+
+// Set initial track position so first rank is centered
+track.style.transform = `translateX(${-(itemWidth/2 + gap/2)}px)`;
+
+// Spin logic
 const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
 function spin(result, user="Someone") {
-    const trackItems = document.querySelectorAll(".item");
-    const gap = 12; // match CSS gap
-
-    // Index of chosen rank in original list
     const rankIndex = ranks.findIndex(r => r.name === result);
-
-    // Full loops before stopping
-    const loops = 5;
-
-    // Total index
+    const loops = 5; // full loops before stopping
     const totalIndex = loops * ranks.length + rankIndex;
 
-    // Measure actual item width
-    const itemWidth = trackItems[0].getBoundingClientRect().width;
-
-    // Compute total offset including gap
+    // Correct offset with actual item width + gap
     const offset = totalIndex * (itemWidth + gap);
-
-    // Centering calculation
     const centerOffset = (window.innerWidth / 2) - (itemWidth / 2);
     const targetPos = offset - centerOffset;
 
-    // Play spin sound
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // Reset track
+    // Reset track to starting position
     track.style.transition = "none";
-    track.style.transform = "translateX(0px)";
+    track.style.transform = `translateX(${-(itemWidth/2 + gap/2)}px)`;
 
     setTimeout(() => {
-        // Smooth acceleration → deceleration
         track.style.transition = "transform 3s cubic-bezier(0.25,0.1,0.25,1)";
         track.style.transform = `translateX(${-targetPos}px)`;
     }, 50);
 
-    // Popup overlay
+    // Overlay popup on landing
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
@@ -119,12 +111,11 @@ function spin(result, user="Someone") {
     }, 3200);
 }
 
-// Random spin for testing
-function spinRandom() {
+// Random spin button
+document.getElementById("spin-btn").addEventListener("click", () => {
     const randomIndex = Math.floor(Math.random() * ranks.length);
-    spin(ranks[randomIndex].name);
-}
-document.getElementById("spin-btn").addEventListener("click", spinRandom);
+    spin(ranks[randomIndex].name, "Player");
+});
 
 // Listen for C# / OBS events
 window.addEventListener("message", (event) => {
