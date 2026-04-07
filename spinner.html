@@ -4,89 +4,13 @@
 <meta charset="UTF-8">
 <title>Fortnite Spinner</title>
 <style>
-body {
-    margin: 0;
-    overflow: hidden;
-    background: transparent;
-    font-family: Arial, sans-serif;
-}
-
-/* Container */
-#container {
-    width: 100%;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-/* Track */
-#track {
-    display: flex;
-    gap: 12px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(0);
-    transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1);
-}
-
-/* Items */
-.item {
-    width: 110px;
-    height: 110px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    font-size: 13px;
-    border: 3px solid rgba(255,255,255,0.2);
-    outline: 4px solid rgba(255,255,255,0.3); /* shadowless outer border */
-    outline-offset: 4px;
-    position: relative;
-}
-
-/* Center highlight - fixed alignment, red with glow */
-.center-box {
-    position: absolute;
-    width: 122px; /* item width + gap */
-    height: 122px; /* slightly bigger than item for emphasis */
-    border: 4px solid red;
-    border-radius: 14px;
-    pointer-events: none;
-    box-shadow: 0 0 20px red; /* glowing effect */
-    z-index: 10;
-}
-
-/* Win popup overlay */
-#win-popup {
-    position: absolute;
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    background: rgba(0,0,0,0.8);
-    color: #fff;
-    font-size: 18px;
-    border-radius: 10px;
-    display: none;
-    text-align: center;
-    z-index: 20;
-    box-shadow: 0 0 15px gold;
-    animation: popupAnim 1s ease forwards;
-}
-
-@keyframes popupAnim {
-    0% {opacity: 0; transform: translate(-50%, -20px);}
-    50% {opacity: 1; transform: translate(-50%, 0);}
-    100% {opacity: 1; transform: translate(-50%, -20px);}
-}
-
-/* Fortnite-style gradients for each rank */
+body { margin: 0; overflow: hidden; background: transparent; font-family: Arial, sans-serif; }
+#container { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
+#track { display: flex; gap: 12px; position: absolute; left: 50%; transform: translateX(0); }
+.item { width: 110px; height: 110px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: white; text-align: center; font-size: 13px; border: 3px solid rgba(255,255,255,0.2); outline: 4px solid rgba(255,255,255,0.3); outline-offset: 4px; position: relative; }
+.center-box { position: absolute; width: 122px; height: 122px; border: 4px solid red; border-radius: 14px; pointer-events: none; box-shadow: 0 0 20px red; z-index: 10; }
+#win-popup { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: rgba(0,0,0,0.8); color: #fff; font-size: 18px; border-radius: 10px; display: none; text-align: center; z-index: 20; box-shadow: 0 0 15px gold; animation: popupAnim 1s ease forwards; }
+@keyframes popupAnim { 0% {opacity: 0; transform: translate(-50%, -20px);} 50% {opacity: 1; transform: translate(-50%, 0);} 100% {opacity: 1; transform: translate(-50%, -20px);} }
 .Bronze { background: linear-gradient(135deg, #B87333, #FF9933); }
 .Silver { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); color: black; }
 .Gold { background: linear-gradient(135deg, #FFD700, #FFFACD); color: black; }
@@ -95,24 +19,8 @@ body {
 .Elite { background: linear-gradient(135deg, #2F4F4F, #008080); }
 .Champion { background: linear-gradient(135deg, #B22222, #FFD700); }
 .Unreal { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
-
-/* Icon inside item */
 .item img { width: 50px; height: 50px; margin-bottom: 5px; }
-
-/* Spin button for testing outside OBS */
-#spin-btn {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background: gold;
-    color: black;
-    cursor: pointer;
-}
+#spin-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 25px; font-size: 16px; border: none; border-radius: 8px; background: gold; color: black; cursor: pointer; }
 #spin-btn:hover { background: #FFD700; }
 </style>
 </head>
@@ -123,10 +31,8 @@ body {
     <div id="track"></div>
     <div id="win-popup"></div>
 </div>
-
 <button id="spin-btn">Spin!</button>
 
-<!-- Sounds -->
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
 <audio id="win-sound" src="https://freesound.org/data/previews/343/343909_624445-lq.mp3"></audio>
 
@@ -143,13 +49,11 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
 ];
 
-// Duplicate list for looping effect
+// Duplicate list for looping
 let fullList = [];
 for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
-
-// Create spinner items
 fullList.forEach(rank => {
     const div = document.createElement("div");
     div.className = "item " + rank.name;
@@ -162,27 +66,33 @@ fullList.forEach(rank => {
     track.appendChild(div);
 });
 
-// Spin logic
+// Spin logic with acceleration & deceleration
 const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
 function spin(result, user="Someone") {
-    const itemWidth = 122; // width + gap
+    const itemWidth = 122; // item + gap
     const index = fullList.lastIndexOf(fullList.find(r => r.name===result));
-    const offset = (index * itemWidth) - (window.innerWidth / 2 - itemWidth/2); // center perfectly
+
+    // Calculate offset so the item is perfectly centered
+    const centerOffset = (window.innerWidth / 2) - (itemWidth / 2);
+    const targetPos = (index * itemWidth) - centerOffset;
 
     spinSound.currentTime = 0;
     spinSound.play();
 
+    // Reset position
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
 
     setTimeout(() => {
-        track.style.transition = "transform 4s cubic-bezier(0.1,0.7,0.1,1)";
-        track.style.transform = `translateX(${-offset}px)`;
+        // Smooth acceleration-deceleration using cubic-bezier
+        track.style.transition = "transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)";
+        track.style.transform = `translateX(${-targetPos}px)`;
     }, 50);
 
+    // Show overlay popup
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
@@ -192,12 +102,11 @@ function spin(result, user="Someone") {
     }, 4200);
 }
 
-// Random spin function for testing outside OBS
+// Random spin for testing
 function spinRandom() {
     const randomIndex = Math.floor(Math.random() * ranks.length);
     spin(ranks[randomIndex].name);
 }
-
 document.getElementById("spin-btn").addEventListener("click", spinRandom);
 
 // Listen for C# / OBS events
