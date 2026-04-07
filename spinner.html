@@ -24,7 +24,6 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     position: absolute;
     left: 0;
     transform: translateX(0);
-    filter: blur(0px);
 }
 
 .item {
@@ -156,16 +155,27 @@ const tickSound = document.getElementById("tick-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
-let spinning = false;
-let tickInterval;
-let blurInterval;
+// 🔥 QUEUE
+let queue = [];
+let isSpinning = false;
 
 function showSpinner() {
-    document.getElementById("container").style.opacity = "1";
+    container.style.opacity = "1";
 }
 
 function hideSpinner() {
-    document.getElementById("container").style.opacity = "0";
+    container.style.opacity = "0";
+}
+
+function processQueue() {
+    if (isSpinning || queue.length === 0) return;
+
+    isSpinning = true;
+
+    const { user, result } = queue.shift();
+
+    showSpinner();
+    spin(result, user);
 }
 
 function spin(result, user="Someone") {
@@ -193,10 +203,9 @@ function spin(result, user="Someone") {
     let blurAmount = 10;
     track.style.filter = `blur(${blurAmount}px)`;
 
-    blurInterval = setInterval(() => {
+    let blurInterval = setInterval(() => {
         blurAmount *= 0.92;
         if (blurAmount <= 0.3) {
-            blurAmount = 0;
             track.style.filter = "blur(0px)";
             clearInterval(blurInterval);
         } else {
@@ -205,7 +214,7 @@ function spin(result, user="Someone") {
     }, 50);
 
     let speed = 50;
-    tickInterval = setInterval(function tick() {
+    let tickInterval = setInterval(function tick() {
         tickSound.currentTime = 0;
         tickSound.play();
         speed += 15;
@@ -220,7 +229,6 @@ function spin(result, user="Someone") {
 
     setTimeout(() => {
         clearInterval(tickInterval);
-        clearInterval(blurInterval);
         track.style.filter = "blur(0px)";
     }, 4500);
 
@@ -233,7 +241,6 @@ function spin(result, user="Someone") {
         items.forEach(el => {
             const rect = el.getBoundingClientRect();
             const center = rect.left + rect.width / 2;
-
             const dist = Math.abs(center - boxCenter);
 
             if (dist < closestDistance) {
@@ -242,12 +249,11 @@ function spin(result, user="Someone") {
             }
         });
 
-        if (closestItem) {
-            closestItem.classList.add("winner");
-        }
+        if (closestItem) closestItem.classList.add("winner");
 
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
+
         winSound.currentTime = 0;
         winSound.play();
 
@@ -270,24 +276,22 @@ function spin(result, user="Someone") {
 
     setTimeout(() => {
         hideSpinner();
-        spinning = false;
+        isSpinning = false;
+        processQueue();
     }, 7000);
 }
 
-// 🔥 THIS IS WHAT MAKES IT WORK
+// 🎯 FOLLOW EVENT
 window.addEventListener("onEventReceived", function (obj) {
 
     if (obj.detail.listener === "follow") {
 
-        if (spinning) return;
-
-        spinning = true;
-
         const user = obj.detail.event.uniqueId || "Someone";
         const randomRank = ranks[Math.floor(Math.random() * ranks.length)].name;
 
-        showSpinner();
-        spin(randomRank, user);
+        queue.push({ user, result: randomRank });
+
+        processQueue();
     }
 
 });
