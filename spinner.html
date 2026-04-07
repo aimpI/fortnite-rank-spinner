@@ -5,12 +5,69 @@
 <title>Fortnite Spinner</title>
 <style>
 body { margin: 0; overflow: hidden; background: transparent; font-family: Arial, sans-serif; }
-#container { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
-#track { display: flex; gap: 12px; position: absolute; left: 50%; transform: translateX(0); }
-.item { width: 110px; height: 110px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; color: white; text-align: center; font-size: 13px; border: 3px solid rgba(255,255,255,0.2); outline: 4px solid rgba(255,255,255,0.3); outline-offset: 4px; position: relative; }
-.center-box { position: absolute; width: 122px; height: 122px; border: 4px solid red; border-radius: 14px; pointer-events: none; box-shadow: 0 0 20px red; z-index: 10; }
-#win-popup { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: rgba(0,0,0,0.8); color: #fff; font-size: 18px; border-radius: 10px; display: none; text-align: center; z-index: 20; box-shadow: 0 0 15px gold; animation: popupAnim 1s ease forwards; }
-@keyframes popupAnim { 0% {opacity: 0; transform: translate(-50%, -20px);} 50% {opacity: 1; transform: translate(-50%, 0);} 100% {opacity: 1; transform: translate(-50%, -20px);} }
+
+#container {
+    width: 100%;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#track {
+    display: flex;
+    gap: 12px;
+    position: absolute;
+    left: 0;
+    transform: translateX(0);
+}
+
+.item {
+    width: 110px;
+    height: 110px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    border: 3px solid rgba(255,255,255,0.2);
+    outline: 4px solid rgba(255,255,255,0.3);
+    outline-offset: 4px;
+}
+
+.center-box {
+    position: absolute;
+    width: 122px;
+    height: 122px;
+    border: 4px solid red;
+    border-radius: 14px;
+    pointer-events: none;
+    box-shadow: 0 0 20px red;
+    z-index: 10;
+}
+
+#win-popup {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 18px;
+    border-radius: 10px;
+    display: none;
+    text-align: center;
+    z-index: 20;
+    box-shadow: 0 0 15px gold;
+}
+
+/* Gradients */
 .Bronze { background: linear-gradient(135deg, #B87333, #FF9933); }
 .Silver { background: linear-gradient(135deg, #C0C0C0, #E0E0E0); color: black; }
 .Gold { background: linear-gradient(135deg, #FFD700, #FFFACD); color: black; }
@@ -19,9 +76,26 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
 .Elite { background: linear-gradient(135deg, #2F4F4F, #008080); }
 .Champion { background: linear-gradient(135deg, #B22222, #FFD700); }
 .Unreal { background: linear-gradient(135deg, #8A2BE2, #4B0082, #DA70D6); }
-.item img { width: 50px; height: 50px; margin-bottom: 5px; }
-#spin-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 25px; font-size: 16px; border: none; border-radius: 8px; background: gold; color: black; cursor: pointer; }
-#spin-btn:hover { background: #FFD700; }
+
+.item img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+}
+
+#spin-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background: gold;
+    color: black;
+    cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -31,6 +105,7 @@ body { margin: 0; overflow: hidden; background: transparent; font-family: Arial,
     <div id="track"></div>
     <div id="win-popup"></div>
 </div>
+
 <button id="spin-btn">Spin!</button>
 
 <audio id="spin-sound" src="https://freesound.org/data/previews/502/502538_10226544-lq.mp3"></audio>
@@ -49,80 +124,90 @@ const ranks = [
   {name: "Unreal", icon: "https://i.imgur.com/xz0Xk0G.png"}
 ];
 
-// Duplicate ranks for smooth looping
+// Duplicate list
 let fullList = [];
-const duplicates = 6;
-for(let i=0;i<duplicates;i++) fullList = fullList.concat(ranks);
+for(let i=0;i<6;i++) fullList = fullList.concat(ranks);
 
 const track = document.getElementById("track");
+
+// Create items
 fullList.forEach(rank => {
     const div = document.createElement("div");
     div.className = "item " + rank.name;
+
     const img = document.createElement("img");
     img.src = rank.icon;
-    div.appendChild(img);
+
     const span = document.createElement("span");
     span.innerText = rank.name;
+
+    div.appendChild(img);
     div.appendChild(span);
     track.appendChild(div);
 });
 
-// Measure item width + gap
 const gap = 12;
-let itemWidth = document.querySelector(".item").getBoundingClientRect().width;
+const item = document.querySelector(".item");
+const itemWidth = item.offsetWidth;
 
-// Set initial track position so first rank is centered
-track.style.transform = `translateX(${-(itemWidth/2 + gap/2)}px)`;
+// PERFECT starting center
+const container = document.getElementById("container");
+const centerStart = (container.offsetWidth / 2) - (itemWidth / 2);
+track.style.transform = `translateX(${centerStart}px)`;
 
-// Spin logic
+// Sounds + popup
 const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
 function spin(result, user="Someone") {
-    const rankIndex = ranks.findIndex(r => r.name === result);
-    const loops = 5; // full loops before stopping
-    const totalIndex = loops * ranks.length + rankIndex;
 
-    // Correct offset with actual item width + gap
-    const offset = totalIndex * (itemWidth + gap);
-    const centerOffset = (window.innerWidth / 2) - (itemWidth / 2);
-    const targetPos = offset - centerOffset;
+    const centerBox = document.querySelector(".center-box");
+
+    const containerRect = container.getBoundingClientRect();
+    const boxRect = centerBox.getBoundingClientRect();
+
+    const boxCenter = boxRect.left - containerRect.left + (boxRect.width / 2);
+
+    const index = fullList.map(r => r.name).lastIndexOf(result);
+
+    const totalWidth = itemWidth + gap;
+    const targetX = index * totalWidth;
+
+    const finalOffset = targetX - boxCenter + (itemWidth / 2);
 
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // Reset track to starting position
+    // Reset
     track.style.transition = "none";
-    track.style.transform = `translateX(${-(itemWidth/2 + gap/2)}px)`;
+    track.style.transform = `translateX(${centerStart}px)`;
 
     setTimeout(() => {
-        track.style.transition = "transform 3s cubic-bezier(0.25,0.1,0.25,1)";
-        track.style.transform = `translateX(${-targetPos}px)`;
+        // 🔥 REALISTIC SLOWDOWN
+        track.style.transition = "transform 4.5s cubic-bezier(0.15, 0.85, 0.25, 1)";
+        track.style.transform = `translateX(${-finalOffset}px)`;
     }, 50);
 
-    // Overlay popup on landing
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
         winSound.currentTime = 0;
         winSound.play();
         setTimeout(() => winPopup.style.display = "none", 2000);
-    }, 3200);
+    }, 4600);
 }
 
-// Random spin button
+// Button test
 document.getElementById("spin-btn").addEventListener("click", () => {
     const randomIndex = Math.floor(Math.random() * ranks.length);
     spin(ranks[randomIndex].name, "Player");
 });
 
-// Listen for C# / OBS events
+// OBS event
 window.addEventListener("message", (event) => {
     if(event.data.type === "spin") {
-        const result = event.data.result;
-        const user = event.data.user || "Someone";
-        spin(result, user);
+        spin(event.data.result, event.data.user || "Someone");
     }
 });
 </script>
