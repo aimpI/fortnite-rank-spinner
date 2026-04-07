@@ -67,40 +67,49 @@ fullList.forEach(rank => {
     track.appendChild(div);
 });
 
-// Spin logic - multi-loop, faster, exact centering
+// Spin logic - multi-loop, exact centering including CSS gap
 const spinSound = document.getElementById("spin-sound");
 const winSound = document.getElementById("win-sound");
 const winPopup = document.getElementById("win-popup");
 
 function spin(result, user="Someone") {
-    const itemWidth = 122; // item + gap
-    const numRanks = ranks.length;
+    const trackItems = document.querySelectorAll(".item");
+    const gap = 12; // match CSS gap
 
-    const loops = 5; // number of full loops before stopping (more = longer spin)
-
-    // exact index of chosen rank
+    // Index of chosen rank in original list
     const rankIndex = ranks.findIndex(r => r.name === result);
 
-    // total index in fullList including loops
-    const totalIndex = loops * numRanks + rankIndex;
+    // Full loops before stopping
+    const loops = 5;
 
+    // Total index
+    const totalIndex = loops * ranks.length + rankIndex;
+
+    // Measure actual item width
+    const itemWidth = trackItems[0].getBoundingClientRect().width;
+
+    // Compute total offset including gap
+    const offset = totalIndex * (itemWidth + gap);
+
+    // Centering calculation
     const centerOffset = (window.innerWidth / 2) - (itemWidth / 2);
-    const targetPos = (totalIndex * itemWidth) - centerOffset;
+    const targetPos = offset - centerOffset;
 
+    // Play spin sound
     spinSound.currentTime = 0;
     spinSound.play();
 
-    // reset track position
+    // Reset track
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
 
     setTimeout(() => {
-        // faster animation, smooth acceleration → deceleration
+        // Smooth acceleration → deceleration
         track.style.transition = "transform 3s cubic-bezier(0.25,0.1,0.25,1)";
         track.style.transform = `translateX(${-targetPos}px)`;
     }, 50);
 
-    // popup overlay
+    // Popup overlay
     setTimeout(() => {
         winPopup.innerText = `${user} is ${result}!`;
         winPopup.style.display = "block";
